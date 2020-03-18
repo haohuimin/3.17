@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haohuimin.cms.dao.LinkDao">
+
+	<insert id="add">
+		insert into cms_friendly_link
+		<set>
+			<if test="null!=text and text!=''">
+				text=#{text},
+			</if>
+			<if test="null!=url and url!=''">
+			 	url=#{url},
+			</if>
+			<if test="null==created">
+			 	created=now()
+			</if>
+		</set>
+	</insert>
+	
+	<select id="selects" resultType="Link">
+		select * from cms_friendly_link 
+		<where>
+			<if test="null!=id and id!=''">and id =#{id}</if>
+			<if test="null!=text and text!=''">and text like concat('%${text}%')</if>
+		</where>
+	</select>
+	<select id="selectLinkID" resultType="Link">
+		select * from cms_friendly_link 
+		where id =#{id}
+	</select>
+	<update id="update">
+		update cms_friendly_link 
+		<set>
+			<if test="null!=text and text!=''"> text=#{text},</if>
+			<if test="null!=url and url!=''"> url=#{url},</if>
+			<if test="null!=created and created!=''">and created=#{created}</if>
+		</set>
+		where id=#{id}
+	</update>
+</mapper>

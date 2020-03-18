@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haohuimin.cms.dao.ArticleDao">
+    
+	
+	<select id="getstatusList" resultMap="ArticleList">
+		select * from cms_article
+		<where>
+			<if test="null!=user_id and user_id!=''">and user_id =${user_id}</if>
+			<if test="null!=title and title!=''">and title like concat('%${title}%')</if>
+			<if test="null!=status and status!=' '">and status =#{status}</if>
+		</where>
+		ORDER BY created desc
+	</select>
+	
+
+	<select id="getArticleList" resultMap="ArticleList">
+		select * from cms_article
+		<where>
+			<if test="null!=user_id and user_id!=''">and user_id =${user_id}</if>
+			<if test="null!=title and title!=''">and title like concat('%${title}%')</if>
+			<!-- <if test="true">and status =1</if>  -->
+			<if test="null!=status and status!=' '">and status =#{status}</if>
+			<if test="channel_id!=null and channel_id!=0">and channel_id=#{channel_id}</if>
+			<if test="category_id!=null and category_id!=0">and category_id=#{category_id}</if>
+			<if test="null!=hot and hot!=0">and hot=1</if>
+			
+		</where>
+		ORDER BY created desc
+	</select>
+	<resultMap type="Article" id="ArticleList">
+		<id property="id" column="id"/>
+		<result property="title" column="title"/>
+		<result property="picture" column="picture"/>
+		<result property="content" column="content"/>
+		<result property="channel_id" column="channel_id"/>
+		<result property="category_id" column="category_id"/>
+		<result property="user_id" column="user_id"/>
+		<result property="hits" column="hits"/>
+		<result property="hot" column="hot"/>
+		<result property="status" column="status"/>
+		<result property="deleted" column="deleted"/>
+		<result property="created" column="created"/>
+		<result property="updated" column="updated"/>
+		<collection property="user" ofType="User" select="selectUser" column="user_id">
+			<id property="id" column="id"/>
+			<result property="username" column="username"/>
+			<result property="nickname" column="nickname"/>
+			<!--性别在数据中是int类型 java类中是枚举类型 使用转换器 否则装载不了 -->
+			<!-- org.apache.ibatis.type.EnumTypeHandler org.apache.ibatis.type.EnumOrdinalTypeHandler -->
+			<!-- <result property="gender" column="gender"
+			javaType="com.haohuimin.cms.domain.enums.Gender"
+			typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/> -->
+			<result property="birthday" column="birthday"/>
+			<result property="created" column="created"/>
+			<result property="updated" column="updated"/>
+			<result property="locked" column="locked"/>
+		</collection>
+		<collection property="contents" ofType="Content" select="selectContent" column="content_id">
+		  <id property="id" column="id"/>
+		  <result property="desc" column="desc"
+		   javaType="com.haohuimin.cms.domain.enums.Desc"
+		   typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+		  />
+		</collection>
+	</resultMap>
+	
+	<select id="selectUser" resultType="User">
+		select id,username,nickname,birthday,created,updated,locked from cms_user where id=#{user_id}
+	</select>
+	<select id="selectContent" resultType="Content">
+	   select id,desc,url from cms_content where id=#{content_id}
+	</select>
+	<select id="selectArticle" resultMap="ArticleList">
+		select * from cms_article where id=#{id}
+	</select>
+	
+	<insert id="add">
+	 	insert into cms_article 
+	 	<set>
+	 	<if test="title!=null">
+	 		title=#{title},
+	 	</if>
+	 	<if test="content!=null">
+	 		content=#{content},
+	 	</if> 
+	 	<if test="picture!=null">
+	 		picture=#{picture},
+	 	</if>
+	 	<if test="channel_id!=null">
+	 		channel_id=#{channel_id},
+	 	</if>
+	 	<if test="category_id!=null">
+	 		category_id=#{category_id},
+	 	</if>
+	 	<if test="user_id!=null">
+	 		user_id=#{user_id},
+	 	</if>
+	 	<if test="hits==null">
+	 		hits=0,
+	 	</if>
+	 	<if test="hot==null">
+	 		hot=0,
+	 	</if>
+	 	<if test="status==null">
+	 		status=0,
+	 	</if>
+	 	<if test="deleted==null">
+	 		deleted=1,
+	 	</if>
+	 	<if test="created==null">
+	 		created=now(),
+	 	</if>
+	 	<if test="updated==null">
+	 		updated=now()
+	 	</if>
+	 	</set>
+	 	
+	</insert>
+
+</mapper>

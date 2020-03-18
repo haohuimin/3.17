@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haohuimin.cms.dao.FavoriteDao">
+
+	<insert id="add">
+		insert into cms_favorite
+		<set>
+			<if test="null!=text and text!=''">
+				text=#{text},
+			</if>
+			<if test="null!=url and url!=''">
+			 	url=#{url},
+			</if>
+			<if test="null!=user_id and user_id!=0">
+			 	user_id=#{user_id},
+			</if>
+			<if test="null==created">
+			 	created=now()
+			</if>
+		</set>
+	</insert>
+	
+	<select id="findFavorite" resultType="Favorite">
+		select * from cms_favorite
+		<where>
+			<if test="null!=user_id and user_id!=''">and user_id =#{user_id}</if>
+			<if test="null!=text and text!=''">and text like concat('%${text}%')</if>
+		</where>
+		ORDER BY created DESC
+	</select>
+	
+	
+</mapper>

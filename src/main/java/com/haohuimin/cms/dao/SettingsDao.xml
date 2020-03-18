@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haohuimin.cms.dao.SettingsDao">
+
+	<insert id="registerAdmin">
+		insert into cms_settings
+		<set>
+			<if test="null!=site_domain and site_domain!=''">
+				site_domain=#{site_domain},
+			</if>
+			<if test="null!=site_name and site_name!=''">
+			 	site_name=#{site_name},
+			</if>
+			<if test="null==article_list_size">
+			 	article_list_size=20,
+			</if>
+			<if test="null==slide_size">
+			 	slide_size=5,
+			</if>
+			<if test="null!=admin_username and admin_username!=''">
+				admin_username=#{admin_username},
+			</if>
+			<if test="null!=admin_password and admin_password!=''">
+			 	admin_password=#{admin_password},
+			</if>
+		</set>
+	</insert>
+	
+	<select id="loginAdmin" resultType="Settings">
+		select * from cms_settings 
+		<where>
+			<if test="null!=admin_username and admin_username!=''">and admin_username=#{admin_username}</if>
+		</where>
+	</select>
+	
+</mapper>

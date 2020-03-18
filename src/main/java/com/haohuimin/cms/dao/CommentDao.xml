@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haohuimin.cms.dao.CommentDao">
+
+		<insert id="addComment">
+			insert into cms_comment
+		<set>
+			<if test="null!=user_id and user_id!=''">
+				user_id=#{user_id},
+			</if>
+			<if test="null!=article_id and article_id!=''">
+			 	article_id=#{article_id},
+			</if>
+			<if test="null!=content and content!=''">
+			 	content=#{content},
+			</if>
+			
+			<if test="null==created">
+			 	created=now()
+			</if>
+		</set>
+	</insert> 
+	
+	<select id="findCommentList" resultMap="commentMap">
+		select * from cms_comment 
+		<where>
+			<if test="null!=id and id!=''">and id=#{id}</if>
+			<if test="null!=article_id and article_id!=''">and article_id=#{article_id}</if>
+			<if test="null!=user_id and user_id!=''">and user_id=#{user_id}</if>
+		</where>
+		ORDER BY created desc
+	</select>
+	
+	<resultMap id="commentMap" type="Comment">
+		<id property="id" column="id"/>
+		<result property="user_id" column="user_id"/>
+		<result property="article_id" column="article_id"/>
+		<result property="content" column="content"/>
+		<result property="created" column="created"/>
+		<collection property="user" ofType="User" select="selectUser" column="user_id">
+			<id property="id" column="id"/>
+			<result property="username" column="username"/>
+			<result property="nickname" column="nickname"/>
+			<!--性别在数据中是int类型 java类中是枚举类型 使用转换器 否则装载不了 -->
+			<!-- org.apache.ibatis.type.EnumTypeHandler org.apache.ibatis.type.EnumOrdinalTypeHandler -->
+			<result property="gender" column="gender"
+			javaType="com.haohuimin.cms.domain.enums.Gender"
+			typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+			<result property="birthday" column="birthday"/>
+			<result property="created" column="created"/>
+			<result property="updated" column="updated"/>
+			<result property="locked" column="locked"/>
+		</collection>
+	</resultMap>
+	<select id="selectUser" resultType="User">
+		select id,username,nickname,birthday,created,updated,locked from cms_user where id=#{user_id}
+	</select>
+	
+	
+	<select id="findCommentNum" resultType="java.lang.Integer">
+		select count(1) from cms_comment where article_id=#{id}
+	</select>
+</mapper>
